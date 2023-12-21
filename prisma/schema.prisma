@@ -88,14 +88,14 @@ model CycleTimeCOA {
 }
 
 model DelayNotesCOA {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String        @id @default(uuid())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   CycleTimeCOA   CycleTimeCOA? @relation(fields: [cycleTimeCOAId], references: [id])
   cycleTimeCOAId String?
-  route String
-  type Type
-  notes String
+  route          String
+  type           Type
+  notes          String
 }
 
 enum Type {
