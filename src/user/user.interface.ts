@@ -22,3 +22,8 @@ export interface EditUser {
     name: string | undefined;
     role: Role | undefined;
 }
+
+export interface ChangePassword {
+    oldPassword: string;
+    newPassword: string;
+}
