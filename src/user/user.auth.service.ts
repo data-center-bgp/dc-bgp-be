@@ -91,35 +91,36 @@ export class UserAuth {
       },
     });
     if (!isExist) {
-        return {
-            code: 404,
-            response: "User is not found!",
-        };
-    };
+      return {
+        code: 404,
+        response: "User is not found!",
+      };
+    }
     const passwordCheck = bcrypt.compareSync(
-        data.oldPassword,
-        isExist.password,
+      data.oldPassword,
+      isExist.password
     );
     if (!passwordCheck) {
-        return {
-            code: 403,
-            response: "Invalid password!"
-        };
-    };
+      return {
+        code: 403,
+        response: "Invalid password!",
+      };
+    }
     const response = await this.prismaService.user.update({
-        where: {
-            id: id,
-        },
-        data: {
-            password: bcrypt.hashSync(
-                data.newPassword,
-                Number(process.env["HASH_SALT"])
-            ),
-        },
+      where: {
+        id: id,
+      },
+      data: {
+        password: bcrypt.hashSync(
+          data.newPassword,
+          Number(process.env["HASH_SALT"])
+        ),
+      },
     });
     return {
-        code: 201,
-        response: response,
+      code: 201,
+      response: response,
     };
-  };
-};
+  }
+}
+
