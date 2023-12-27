@@ -45,8 +45,8 @@ export interface CreateCycleTimeCOA {
     assistConnectEntry_discharge: Date;
     docking_discharge: Date;
     loadingMasterOnboard_discharge: Date;
-    startLoading_discharge: Date;
-    finishLoading_discharge: Date;
+    startDischarge_discharge: Date;
+    finishDischarge_discharge: Date;
     documentCargoOnboard_discharge: Date;
     orderAssistTugboatExit_discharge: Date;
     assistConnectExit_discharge: Date;
