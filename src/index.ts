@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { userRouter } from "./user/user.router";
+import { cycleTimeCOARouter } from "./cycleTimeCOA/cycleTimeCOA.router";
 import { createServer } from "http";
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(cors());
 const server = createServer(app);
 
 app.use("/user", userRouter);
+app.use("/cycleTimeCOA", cycleTimeCOARouter);
 
 server.listen(port, () => {
     console.log(`Server run at ${port}`);

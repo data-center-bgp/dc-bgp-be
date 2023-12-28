@@ -111,3 +111,5 @@ cycleTimeCOARouter.delete("/cycleTimeCOA/:id", authenticationMiddleware, authori
         res.status(500).json(err);
     }
 })
+
+export { cycleTimeCOARouter }; 
