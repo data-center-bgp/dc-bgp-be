@@ -2,7 +2,7 @@ export interface CreateCycleTimeCOA {
     userId: string;
     startDate: Date;
     year: number;
-    month: string;
+    month: "January" | "February" | "March" | "April" | "May" | "June" | "July" | "August" | "September" | "October" | "November" | "December";
     trip: number;
     fleet: string;
     tugboat_spob: string;

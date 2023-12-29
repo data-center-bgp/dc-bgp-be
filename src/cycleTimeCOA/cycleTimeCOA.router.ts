@@ -79,7 +79,25 @@ cycleTimeCOARouter.get("/cycleTimeCOA", authenticationMiddleware, async (req, re
 cycleTimeCOARouter.get("/cycleTimeCOA/:id", authenticationMiddleware, async (req, res) => {
     try {
         const response = await cycleTimeCOAService.getCycleTimeCOAByID(req.params.id);
-        res.status(response.code).json(response.response)
+        res.status(response.code).json(response.response);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+cycleTimeCOARouter.get("/cycleTimeCOA/:month", authenticationMiddleware, async (req, res) => {
+    try {
+        const response = await cycleTimeCOAService.getCycleTimeCOAByMonth(req.params.month);
+        res.status(response.code).json(response.response);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
+cycleTimeCOARouter.get("/cycleTimeCOA/:fleet", authenticationMiddleware, async (req, res) => {
+    try {
+        const response = await cycleTimeCOAService.getCycleTimeCOAByFleet(req.params.fleet);
+        res.status(response.code).json(response.response);
     } catch (err) {
         res.status(500).json(err);
     }
