@@ -5,7 +5,7 @@ import {
 import { PrismaService } from "../prisma.service";
 import { response } from "express";
 
-export class DelayNotesCOA {
+export class DelayNotesCOAService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getAllDelayNotesCOA() {
