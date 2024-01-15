@@ -54,10 +54,11 @@ const authorizationMiddleware = (
     const token = String(
       req.headers["authorization"]?.split(" ")[1].replace("'", "")
     );
-    if (userGuard.authorization(req.params.id, token)) {
+    const userRole = userGuard.getRoleFromToken(token);
+    if (userRole === Role.MASTER) {
       next();
     } else {
-      res.status(403).json("Forbidden!");
+      res.status(403).json("You don't have permission to access this resource!");
     }
   } catch (err) {
     res.status(500).json("Server error!");
@@ -85,9 +86,9 @@ userRouter.post("/auth/login", async (req, res) => {
 });
 
 // GET ALL USER
-userRouter.get("/", async (req, res) => {
+userRouter.get("/", authorizationMiddleware, async (req, res) => {
   try {
-    const response = await userService.getAllUser(req.body);
+    const response = await userService.getAllUser();
     res.status(response.code).json(response.response);
   } catch (err) {
     res.status(500).json(err);
@@ -95,7 +96,7 @@ userRouter.get("/", async (req, res) => {
 });
 
 // GET USER BY EMAIL
-userRouter.get("/search", async (req, res) => {
+userRouter.get("/search", authorizationMiddleware, async (req, res) => {
   try {
     let email: string;
     if (typeof req.query.email === "string") {
@@ -104,13 +105,14 @@ userRouter.get("/search", async (req, res) => {
       email = "";
     }
     const role = Role;
-    const response = await userService.getUserByEmail(role.MASTER, email);
+    const response = await userService.getUserByEmail(email);
     res.status(response.code).json(response.response);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
+// EDIT USER DATA (NOT PASSWORD)
 userRouter
   .route("/:id")
   .patch(
@@ -120,7 +122,7 @@ userRouter
       try {
         const id = req.params.id;
         const data: EditUser = req.body;
-        const response = await userService.editUserData(Role.MASTER, id, data);
+        const response = await userService.editUserData(id, data);
         res.status(response.code).json(response.response);
       } catch (err) {
         res.status(500).json(err);
@@ -128,6 +130,7 @@ userRouter
     }
   );
 
+// DELETE USER
 userRouter
   .route("/:id")
   .delete(
@@ -136,7 +139,7 @@ userRouter
     async (req, res) => {
       try {
         const id = req.params.id;
-        const response = await userService.deleteUser(Role.MASTER, id);
+        const response = await userService.deleteUser(id);
         res.status(response.code).json(response.response);
       } catch (err) {
         res.status(500).json(err);
@@ -144,8 +147,9 @@ userRouter
     }
   );
 
+// CHANGE PASSWORD
   userRouter.patch(
-    "change-password/:id",
+    "/change-password/:id",
     authenticationMiddleware,
     authorizationMiddleware,
     async (req, res) => {
