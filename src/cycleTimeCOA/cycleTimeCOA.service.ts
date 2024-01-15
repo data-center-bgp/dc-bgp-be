@@ -106,7 +106,7 @@ export class CycleTimeCOAService {
     } catch (err) {
       return {
         code: 500,
-        response: "Internal server error!",
+        response: (err as Error).message || "Internal server error!",
       };
     }
   }

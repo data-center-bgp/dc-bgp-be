@@ -67,7 +67,7 @@ const roleGuard = (
     }
 };
 
-cycleTimeCOARouter.get("/cycleTimeCOA", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.get("/", authenticationMiddleware, async (req, res) => {
     try {
         const response = await cycleTimeCOAService.getAllCycleTimeCOA();
         res.status(response.code).json(response.response);
@@ -76,7 +76,7 @@ cycleTimeCOARouter.get("/cycleTimeCOA", authenticationMiddleware, async (req, re
     }
 });
 
-cycleTimeCOARouter.get("/cycleTimeCOA/:id", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.get("/:id", authenticationMiddleware, async (req, res) => {
     try {
         const response = await cycleTimeCOAService.getCycleTimeCOAByID(req.params.id);
         res.status(response.code).json(response.response);
@@ -85,7 +85,7 @@ cycleTimeCOARouter.get("/cycleTimeCOA/:id", authenticationMiddleware, async (req
     }
 });
 
-cycleTimeCOARouter.get("/cycleTimeCOA/:month", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.get("/:month", authenticationMiddleware, async (req, res) => {
     try {
         const response = await cycleTimeCOAService.getCycleTimeCOAByMonth(req.params.month);
         res.status(response.code).json(response.response);
@@ -94,7 +94,7 @@ cycleTimeCOARouter.get("/cycleTimeCOA/:month", authenticationMiddleware, async (
     }
 });
 
-cycleTimeCOARouter.get("/cycleTimeCOA/:fleet", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.get("/:fleet", authenticationMiddleware, async (req, res) => {
     try {
         const response = await cycleTimeCOAService.getCycleTimeCOAByFleet(req.params.fleet);
         res.status(response.code).json(response.response);
@@ -103,7 +103,7 @@ cycleTimeCOARouter.get("/cycleTimeCOA/:fleet", authenticationMiddleware, async (
     }
 });
 
-cycleTimeCOARouter.post("/cycleTimeCOA", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.post("/create", authenticationMiddleware, async (req, res) => {
     try {
         const response = await cycleTimeCOAService.createCycleTimeCOA(req.body);
         res.status(response.code).json(response.response);
@@ -112,7 +112,7 @@ cycleTimeCOARouter.post("/cycleTimeCOA", authenticationMiddleware, async (req, r
     }
 });
 
-cycleTimeCOARouter.patch("/cycleTimeCOA/:id", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.patch("/update/:id", authenticationMiddleware, async (req, res) => {
     try {
         const response = await cycleTimeCOAService.editCycleTimeCOA(req.params.id, req.body);
         res.status(response.code).json(response.response);
@@ -121,7 +121,7 @@ cycleTimeCOARouter.patch("/cycleTimeCOA/:id", authenticationMiddleware, async (r
     }
 });
 
-cycleTimeCOARouter.delete("/cycleTimeCOA/:id", authenticationMiddleware, authorizationMiddleware, async (req, res) => {
+cycleTimeCOARouter.delete("/delete/:id", authenticationMiddleware, authorizationMiddleware, async (req, res) => {
     try {
         const response = await cycleTimeCOAService.deleteCycleTimeCOA(req.params.id);
         res.status(response.code).json(response.response);

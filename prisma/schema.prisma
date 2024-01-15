@@ -80,6 +80,7 @@ model CycleTimeCOA {
   finishDischarge_discharge         DateTime
   documentCargoOnboard_discharge    DateTime
   orderAssistTugboatExit_discharge  DateTime
+  assistConnectExit_discharge       DateTime
   castOff_discharge                 DateTime
   arrivedInPulauAtas                DateTime
   fullAwayAfterDischarge            DateTime
