@@ -52,7 +52,7 @@ export class CycleTimeCOAService {
 
   async getCycleTimeCOAByMonth(month: string) {
     try {
-      const response = await this.prismaService.cycleTimeCOA.findFirst({
+      const response = await this.prismaService.cycleTimeCOA.findMany({
         where: {
           month: month,
         },

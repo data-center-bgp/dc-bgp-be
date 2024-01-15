@@ -10,16 +10,16 @@ export class CycleTimeCOAGuard {
     }
   }
 
-  authorize(id: string, token: string, requiredRole: string): boolean {
+  authorize(id: string, token: string, allowedRoles: Role[]): boolean {
     try {
       const decodedToken = this.authenticate(token);
       if (typeof decodedToken === "boolean") {
         return false;
       }
-      if (decodedToken.id === id) {
+      if (decodedToken.id !== id) {
         return false;
       }
-      if (decodedToken.role !== requiredRole) {
+      if (!allowedRoles.includes(decodedToken.role)) {
         return false;
       }
       return true;
@@ -28,21 +28,15 @@ export class CycleTimeCOAGuard {
     }
   }
 
-  roleGuard(id: string, token: string, requiredRole: string) {
+  roleGuard(id: string, token: string, allowedRoles: Role[]) {
     try {
-      const isAuthorized = this.authorize(id, token, requiredRole);
-      console.log("isAuthorized:", isAuthorized);
-      if (!isAuthorized) {
-        return false;
-      }
       const decodedToken = this.authenticate(token);
       if (typeof decodedToken === "boolean") {
         return false;
       }
-      if (decodedToken.role !== Role.MASTER) {
+      if (!allowedRoles.includes(decodedToken.role)) {
         return false;
       }
-      console.log(decodedToken);
       return true;
     } catch (err) {
       return false;
