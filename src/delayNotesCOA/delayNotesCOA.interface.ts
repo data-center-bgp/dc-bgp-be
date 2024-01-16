@@ -1,7 +1,7 @@
 export interface CreateDelayNoteCOA {
     cycleTimeCOAId: string;
     route: string;
-    acticity: string;
+    activity: string;
     type: Type
     notes: string;
 }
