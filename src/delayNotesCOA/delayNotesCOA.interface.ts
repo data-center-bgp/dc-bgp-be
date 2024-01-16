@@ -1,6 +1,7 @@
 export interface CreateDelayNoteCOA {
     cycleTimeCOAId: string;
     route: string;
+    acticity: string;
     type: Type
     notes: string;
 }
@@ -8,6 +9,7 @@ export interface CreateDelayNoteCOA {
 export interface EditDelayNoteCOA {
     cycleTimeCOAId?: string;
     route?: string;
+    activity?: string;
     type?: Type;
     notes?: string;
 }
