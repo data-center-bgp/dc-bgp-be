@@ -1,8 +1,8 @@
-import { Role } from "@prisma/client";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { Role } from '@prisma/client';
 
 export class CycleTimeCOAGuard {
-  authenticate(token: string): JwtPayload | boolean {
+  authentication(token: string) {
     try {
       return jwt.verify(token, String(process.env["JWT_KEY"])) as JwtPayload;
     } catch (err) {
@@ -10,42 +10,30 @@ export class CycleTimeCOAGuard {
     }
   }
 
-  authorize(id: string, token: string, requiredRole: string): boolean {
+  authorization(id: string, token: string, allowedRoles: Role[]) {
     try {
-      const decodedToken = this.authenticate(token);
+      const decodedToken = this.authentication(token);
       if (typeof decodedToken === "boolean") {
         return false;
       }
-      if (decodedToken.id === id) {
+      if (decodedToken.id !== id) {
         return false;
       }
-      if (decodedToken.role !== requiredRole) {
+      if (!allowedRoles.includes(decodedToken.role)) {
         return false;
       }
       return true;
-    } catch (err) {
+    } catch (error) {
       return false;
     }
   }
 
-  roleGuard(id: string, token: string, requiredRole: string) {
+  getRoleFromToken(token: string): Role | null {
     try {
-      const isAuthorized = this.authorize(id, token, requiredRole);
-      console.log("isAuthorized:", isAuthorized);
-      if (!isAuthorized) {
-        return false;
-      }
-      const decodedToken = this.authenticate(token);
-      if (typeof decodedToken === "boolean") {
-        return false;
-      }
-      if (decodedToken.role !== Role.MASTER) {
-        return false;
-      }
-      console.log(decodedToken);
-      return true;
+      const decodedToken = jwt.verify(token, String(process.env["JWT_KEY"])) as JwtPayload;
+      return decodedToken.role;
     } catch (err) {
-      return false;
+      return null;
     }
   }
 }

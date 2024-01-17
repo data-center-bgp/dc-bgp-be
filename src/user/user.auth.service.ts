@@ -71,7 +71,7 @@ export class UserAuth {
       const returnValue = {
         id: response.id,
         access_token: token,
-        role: Role,
+        role: response.role,
       };
       return {
         code: 200,
@@ -123,4 +123,3 @@ export class UserAuth {
     };
   }
 }
-

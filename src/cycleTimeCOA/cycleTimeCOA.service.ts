@@ -52,7 +52,7 @@ export class CycleTimeCOAService {
 
   async getCycleTimeCOAByMonth(month: string) {
     try {
-      const response = await this.prismaService.cycleTimeCOA.findFirst({
+      const response = await this.prismaService.cycleTimeCOA.findMany({
         where: {
           month: month,
         },
@@ -106,7 +106,7 @@ export class CycleTimeCOAService {
     } catch (err) {
       return {
         code: 500,
-        response: "Internal server error!",
+        response: (err as Error).message || "Internal server error!",
       };
     }
   }

@@ -5,13 +5,7 @@ import { Role } from "@prisma/client";
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getAllUser(role: Role) {
-    if (role !== Role.MASTER) {
-      return {
-        code: 403,
-        response: "You don't have permission to access this resource!",
-      };
-    }
+  async getAllUser() {
     const response = await this.prismaService.user.findMany();
     response.map((res) => {
       res.password = "";
@@ -22,13 +16,7 @@ export class UserService {
     };
   }
 
-  async getUserByEmail(role: Role, email: string) {
-    if (role !== Role.MASTER) {
-      return {
-        code: 403,
-        response: "You don't have permission to access this resource!",
-      };
-    }
+  async getUserByEmail(email: string) {
     const response = await this.prismaService.user.findFirst({
       where: {
         email: email,
@@ -47,13 +35,7 @@ export class UserService {
     };
   }
 
-  async editUserData(role: Role, id: string, data: EditUser) {
-    if (role !== Role.MASTER) {
-      return {
-        code: 403,
-        response: "You don't have permission to access this resource!",
-      };
-    }
+  async editUserData(id: string, data: EditUser) {
     const isExist = await this.prismaService.user.findFirst({
       where: {
         id: id,
@@ -90,13 +72,7 @@ export class UserService {
     };
   }
 
-  async deleteUser(role: Role, id: string) {
-    if (role !== Role.MASTER) {
-      return {
-        code: 403,
-        response: "You don't have permission to access this resource!",
-      };
-    }
+  async deleteUser(id: string) {
     const response = await this.prismaService.user.delete({
       where: {
         id: id,

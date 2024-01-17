@@ -9,125 +9,147 @@ const cycleTimeCOAService = new CycleTimeCOAService(prismaService);
 const cycleTimeCOAGuard = new CycleTimeCOAGuard();
 const cycleTimeCOARouter = express.Router();
 
-const authenticationMiddleware = (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-) => {
-    try {
-        const token = String(
-            req.headers["authorization"]?.split(" ")[1].replace("'", "")
-        );
-        const checkToken = cycleTimeCOAGuard.authenticate(token);
-        if (checkToken) {
-            next();
-        } else {
-            res.status(401).json("Invalid token!")
-        };
-    } catch (err) {
-        res.status(500).json("Error authenticating!")
-    }
+interface CustomRequest extends Request {
+  id?: string;
+  role?: Role;
 }
 
-const authorizationMiddleware = (
-    req: Request,
-    res: Response,
-    next: NextFunction,
+const authenticationMiddleware = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
 ) => {
-    try {
-        const token = String(
-            req.headers["authorization"]?.split(" ")[1].replace("'", "")
-        );
-        if (cycleTimeCOAGuard.authorize(req.params.id, token, req.params.requiredRole)) {
-            next();
-        } else {
-            res.status(403).json("Forbidden!");
-        }
-    } catch (err) {
-        res.status(500).json("Server error!")
+  try {
+    const token = String(
+      req.headers["authorization"]?.split(" ")[1].replace("'", "")
+    );
+    const checkToken = cycleTimeCOAGuard.authentication(token);
+    if (checkToken) {
+      req.id = checkToken.id;
+      req.role = checkToken.role;
+      next();
+    } else {
+      res.status(401).json("Invalid token!");
     }
+  } catch (err) {
+    req.id = "";
+    res.status(500).json("Error authenticating!");
+  }
 };
 
-const roleGuard = (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-) => {
+const authorizationMiddleware =
+  (allowedRoles: Role[]) =>
+  (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
-        const token = String(
-            req.headers["authorization"]?.split(" ")[1].replace("'", "")
-        );
-        if (cycleTimeCOAGuard.roleGuard(req.params.id, token, req.params.requiredRole)) {
-            next();
-        } else {
-            res.status(403).json("Forbidden!");
-        }
+      const token = String(
+        req.headers["authorization"]?.split(" ")[1].replace("'", "")
+      );
+      const userRole = cycleTimeCOAGuard.getRoleFromToken(token);
+      if (userRole === null) {
+        res.status(401).json("Invalid token!");
+      } else if (allowedRoles.includes(userRole)) {
+        next();
+      } else {
+        res.status(403).json("You don't have permission to access this!");
+      }
     } catch (err) {
-        res.status(500).json("Server error!")
+      res.status(500).json("Server error!");
     }
-};
+  };
 
-cycleTimeCOARouter.get("/cycleTimeCOA", authenticationMiddleware, async (req, res) => {
-    try {
-        const response = await cycleTimeCOAService.getAllCycleTimeCOA();
-        res.status(response.code).json(response.response);
-    } catch (err) {
-        res.status(500).json(err);
-    }
+cycleTimeCOARouter.get("/", authenticationMiddleware, async (req, res) => {
+  try {
+    const response = await cycleTimeCOAService.getAllCycleTimeCOA();
+    res.status(response.code).json(response.response);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-cycleTimeCOARouter.get("/cycleTimeCOA/:id", authenticationMiddleware, async (req, res) => {
-    try {
-        const response = await cycleTimeCOAService.getCycleTimeCOAByID(req.params.id);
-        res.status(response.code).json(response.response);
-    } catch (err) {
-        res.status(500).json(err);
-    }
+cycleTimeCOARouter.get("/:id", authenticationMiddleware, async (req, res) => {
+  try {
+    const response = await cycleTimeCOAService.getCycleTimeCOAByID(
+      req.params.id
+    );
+    res.status(response.code).json(response.response);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-cycleTimeCOARouter.get("/cycleTimeCOA/:month", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.get(
+  "/:month",
+  authenticationMiddleware,
+  async (req, res) => {
     try {
-        const response = await cycleTimeCOAService.getCycleTimeCOAByMonth(req.params.month);
-        res.status(response.code).json(response.response);
+      const response = await cycleTimeCOAService.getCycleTimeCOAByMonth(
+        req.params.month
+      );
+      res.status(response.code).json(response.response);
     } catch (err) {
-        res.status(500).json(err);
+      res.status(500).json(err);
     }
-});
+  }
+);
 
-cycleTimeCOARouter.get("/cycleTimeCOA/:fleet", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.get(
+  "/:fleet",
+  authenticationMiddleware,
+  async (req, res) => {
     try {
-        const response = await cycleTimeCOAService.getCycleTimeCOAByFleet(req.params.fleet);
-        res.status(response.code).json(response.response);
+      const response = await cycleTimeCOAService.getCycleTimeCOAByFleet(
+        req.params.fleet
+      );
+      res.status(response.code).json(response.response);
     } catch (err) {
-        res.status(500).json(err);
+      res.status(500).json(err);
     }
-});
+  }
+);
 
-cycleTimeCOARouter.post("/cycleTimeCOA", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.post(
+  "/create",
+  authorizationMiddleware([Role.MASTER, Role.ADMIN]),
+  async (req, res) => {
     try {
-        const response = await cycleTimeCOAService.createCycleTimeCOA(req.body);
-        res.status(response.code).json(response.response);
+      const response = await cycleTimeCOAService.createCycleTimeCOA(req.body);
+      res.status(response.code).json(response.response);
     } catch (err) {
-        res.status(500).json(err);
+      res.status(500).json(err);
     }
-});
+  }
+);
 
-cycleTimeCOARouter.patch("/cycleTimeCOA/:id", authenticationMiddleware, async (req, res) => {
+cycleTimeCOARouter.patch(
+  "/edit/:id",
+  authorizationMiddleware([Role.MASTER, Role.ADMIN]),
+  async (req, res) => {
     try {
-        const response = await cycleTimeCOAService.editCycleTimeCOA(req.params.id, req.body);
-        res.status(response.code).json(response.response);
+      const response = await cycleTimeCOAService.editCycleTimeCOA(
+        req.params.id,
+        req.body
+      );
+      res.status(response.code).json(response.response);
     } catch (err) {
-        res.status(500).json(err);
+      res.status(500).json(err);
     }
-});
+  }
+);
 
-cycleTimeCOARouter.delete("/cycleTimeCOA/:id", authenticationMiddleware, authorizationMiddleware, async (req, res) => {
+cycleTimeCOARouter.delete(
+  "/delete/:id",
+  authenticationMiddleware,
+  authorizationMiddleware([Role.MASTER]),
+  async (req, res) => {
     try {
-        const response = await cycleTimeCOAService.deleteCycleTimeCOA(req.params.id);
-        res.status(response.code).json(response.response);
+      const response = await cycleTimeCOAService.deleteCycleTimeCOA(
+        req.params.id
+      );
+      res.status(response.code).json(response.response);
     } catch (err) {
-        res.status(500).json(err);
+      res.status(500).json(err);
     }
-})
+  }
+);
 
-export { cycleTimeCOARouter }; 
+export { cycleTimeCOARouter };

@@ -1,9 +1,15 @@
+import { Role } from "@prisma/client";
 import jwt, { JwtPayload } from "jsonwebtoken";
+
+import dotenv from "dotenv";
+dotenv.config();
+
+console.log('JWT_KEY:', process.env.JWT_KEY);
 
 export class UserGuard {
   authentication(token: string) {
     try {
-      return jwt.verify(token, String(process.env["JWT_KEY"])) as JwtPayload;
+      return jwt.verify(token, String(process.env.JWT_KEY)) as JwtPayload;
     } catch (err) {
       return false;
     }
@@ -21,6 +27,15 @@ export class UserGuard {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  getRoleFromToken(token: string): Role | null {
+    try {
+      const decodedToken = jwt.verify(token, process.env.JWT_KEY as string) as JwtPayload;
+      return decodedToken.role;
+    } catch (err) {
+      return null;
     }
   }
 }

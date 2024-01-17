@@ -26,65 +26,67 @@ enum Role {
 }
 
 model CycleTimeCOA {
-  id                                String          @id @default(uuid())
-  createdAt                         DateTime        @default(now())
-  updatedAt                         DateTime        @updatedAt
-  user                              User            @relation(fields: [userId], references: [id])
-  userId                            String
-  startDate                         DateTime
-  year                              Int
-  month                             String
-  trip                              Int
-  fleet                             String
-  tugboat_spob                      String
-  ob_spob                           String
-  route                             String
-  estimatedFuel                     Int
-  actualFuel                        Int
-  arrivedInLoadingDock              DateTime
-  orderAssistTugboatEntry           DateTime
-  startAnchorUp                     DateTime
-  finishAnchorUp                    DateTime
-  assistConnectEntry                DateTime
-  docking                           DateTime
-  loadingMasterOnboard              DateTime
-  startLoading                      DateTime
-  finishLoading                     DateTime
-  startSounding                     DateTime
-  finishSounding                    DateTime
-  orderAssistTugboatExit            DateTime
-  assistConnectExit                 DateTime
-  castOff                           DateTime
-  fullAway_STS                      DateTime
-  arrivedAt_STS                     DateTime
-  orderAssistTugboatEntry_STS       DateTime
-  assistConnectEntry_STS            DateTime
-  docking_STS                       DateTime
-  loadingMasterOnboard_STS          DateTime
-  startLoading_STS                  DateTime
-  finishLoading_STS                 DateTime
-  startSounding_STS                 DateTime
-  finishSounding_STS                DateTime
-  orderAssistTugboatExit_STS        DateTime
-  assistConnectExit_STS             DateTime
-  castOff_STS                       DateTime
-  fullAway_discharge                DateTime
-  arrivedAt_discharge               DateTime
-  orderAssistTugboatEntry_discharge DateTime
-  startAnchorUp_discharge           DateTime
-  finishAnchorUp_discharge          DateTime
-  assistConnectEntry_discharge      DateTime
-  docking_discharge                 DateTime
-  loadingMasterOnboard_discharge    DateTime
-  startDischarge_discharge          DateTime
-  finishDischarge_discharge         DateTime
-  documentCargoOnboard_discharge    DateTime
-  orderAssistTugboatExit_discharge  DateTime
-  castOff_discharge                 DateTime
-  arrivedInPulauAtas                DateTime
-  fullAwayAfterDischarge            DateTime
-  arrivedInLoadingDock_2            DateTime
-  delayNotesCOA                     DelayNotesCOA[]
+  id                                    String          @id @default(uuid())
+  createdAt                             DateTime        @default(now())
+  updatedAt                             DateTime        @updatedAt
+  user                                  User            @relation(fields: [userId], references: [id])
+  userId                                String
+  startDate                             DateTime
+  year                                  Int
+  month                                 String
+  trip                                  Int
+  fleet                                 String
+  tugboatOrSpob                         String
+  obOrSpob                              String
+  route                                 String
+  estimatedFuel                         Int?
+  actualFuel                            Int?
+  distance                              Int?
+  startFromJettyLoading                 DateTime?
+  orderAssistTugboatEntryJettyLoading   DateTime?
+  startAnchorUpJettyLoading             DateTime?
+  finishAnchorUpJettyLoading            DateTime?
+  assistConnectEntryJettyLoading        DateTime?
+  berthingJettyLoading                  DateTime?
+  loadingMasterOnboardJettyLoading      DateTime?
+  startLoadingJettyLoading              DateTime?
+  finishLoadingJettyLoading             DateTime?
+  startSoundingJettyLoading             DateTime?
+  finishSoundingJettyLoading            DateTime?
+  orderAssistTugboatExitJettyLoading    DateTime?
+  assistConnectExitJettyLoading         DateTime?
+  castOffJettyLoading                   DateTime?
+  fullAwaySTS                           DateTime?
+  arrivedAtSTS                          DateTime?
+  orderAssistTugboatEntrySTS            DateTime?
+  assistConnectEntrySTS                 DateTime?
+  berthingSTS                           DateTime?
+  loadingMasterOnboardSTS               DateTime?
+  startLoadingSTS                       DateTime?
+  finishLoadingSTS                      DateTime?
+  startSoundingSTS                      DateTime?
+  finishSoundingSTS                     DateTime?
+  orderAssistTugboatExitSTS             DateTime?
+  assistConnectExitSTS                  DateTime?
+  castOffSTS                            DateTime?
+  fullAwayJettyDischarge                DateTime?
+  arrivedAtJettyDischarge               DateTime?
+  orderAssistTugboatEntryJettyDischarge DateTime?
+  startAnchorUpJettyDischarge           DateTime?
+  finishAnchorUpJettyDischarge          DateTime?
+  assistConnectEntryJettyDischarge      DateTime?
+  berthingJettyDischarge                DateTime?
+  loadingMasterOnboardJettyDischarge    DateTime?
+  startDischargeJettyDischarge          DateTime?
+  finishDischargeJettyDischarge         DateTime?
+  documentCargoOnboardJettyDischarge    DateTime?
+  orderAssistTugboatExitJettyDischarge  DateTime?
+  assistConnectExitJettyDischarge       DateTime?
+  castOffJettyDischarge                 DateTime?
+  arrivedInPulauAtas                    DateTime?
+  fullAwayAfterDischarge                DateTime?
+  finishInJettyLoading                  DateTime?
+  delayNotesCOA                         DelayNotesCOA[]
 }
 
 model DelayNotesCOA {
@@ -94,11 +96,7 @@ model DelayNotesCOA {
   CycleTimeCOA   CycleTimeCOA? @relation(fields: [cycleTimeCOAId], references: [id])
   cycleTimeCOAId String?
   route          String
-  type           Type
+  activity       String
+  type           String
   notes          String
-}
-
-enum Type {
-  Internal
-  External
 }

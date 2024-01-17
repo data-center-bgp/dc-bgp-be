@@ -3,7 +3,6 @@ import {
   EditDelayNoteCOA,
 } from "./delayNotesCOA.interface";
 import { PrismaService } from "../prisma.service";
-import { response } from "express";
 
 export class DelayNotesCOAService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -54,10 +53,26 @@ export class DelayNotesCOAService {
     }
   }
 
-  async createDelayNotesCOA(data: CreateDelayNoteCOA) {
+  async createDelayNotesCOA(data: CreateDelayNoteCOA, cycleTimeCOAId: string) {
     try {
+      const cycleTimeCOA = await this.prismaService.cycleTimeCOA.findUnique({
+        where: {
+          id: cycleTimeCOAId,
+        },
+      });
+      if (!cycleTimeCOA) {
+        return {
+          code: 404,
+          response: "Data is not found!",
+        };
+      }
+      const delayNotesCOAData = {
+        ...data,
+        cycleTimeCOAId: cycleTimeCOAId,
+        route: cycleTimeCOA.route,
+      };
       const response = await this.prismaService.delayNotesCOA.create({
-        data: data,
+        data: delayNotesCOAData,
       });
       return {
         code: 201,
@@ -71,13 +86,32 @@ export class DelayNotesCOAService {
     }
   }
 
-  async editDelayNotesCOA(id: string, data: EditDelayNoteCOA) {
+  async editDelayNotesCOA(
+    delayNotesCOAId: string,
+    cycleTimeCOAId: string,
+    data: EditDelayNoteCOA
+  ) {
     try {
+      const cycleTimeCOA = await this.prismaService.cycleTimeCOA.findUnique({
+        where: {
+          id: cycleTimeCOAId,
+        },
+      });
+      if (!cycleTimeCOA) {
+        return {
+          code: 404,
+          response: "CycleTimeCOA data is not found!",
+        };
+      }
+      const delayNotesCOAData = {
+        ...data,
+        route: cycleTimeCOA.route,
+      };
       const response = await this.prismaService.delayNotesCOA.update({
         where: {
-          id: id,
+          id: delayNotesCOAId,
         },
-        data: data,
+        data: delayNotesCOAData,
       });
       return {
         code: 200,
