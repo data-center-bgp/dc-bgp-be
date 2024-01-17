@@ -59,7 +59,7 @@ export class DelayNotesCOAService {
         where: {
           id: cycleTimeCOAId,
         },
-      })
+      });
       if (!cycleTimeCOA) {
         return {
           code: 404,
@@ -68,8 +68,9 @@ export class DelayNotesCOAService {
       }
       const delayNotesCOAData = {
         ...data,
+        cycleTimeCOAId: cycleTimeCOAId,
         route: cycleTimeCOA.route,
-      }
+      };
       const response = await this.prismaService.delayNotesCOA.create({
         data: delayNotesCOAData,
       });
@@ -85,40 +86,44 @@ export class DelayNotesCOAService {
     }
   }
 
-  async editDelayNotesCOA(delayNotesCOAId: string, cycleTimeCOAId: string, data: EditDelayNoteCOA) {
+  async editDelayNotesCOA(
+    delayNotesCOAId: string,
+    cycleTimeCOAId: string,
+    data: EditDelayNoteCOA
+  ) {
     try {
-        const cycleTimeCOA = await this.prismaService.cycleTimeCOA.findUnique({
-            where: {
-                id: cycleTimeCOAId,
-            },
-        });
-        if (!cycleTimeCOA) {
-            return {
-                code: 404,
-                response: "CycleTimeCOA data is not found!",
-            };
-        }
-        const delayNotesCOAData = {
-            ...data,
-            route: cycleTimeCOA.route,
-        };
-        const response = await this.prismaService.delayNotesCOA.update({
-            where: {
-                id: delayNotesCOAId,
-            },
-            data: delayNotesCOAData,
-        });
+      const cycleTimeCOA = await this.prismaService.cycleTimeCOA.findUnique({
+        where: {
+          id: cycleTimeCOAId,
+        },
+      });
+      if (!cycleTimeCOA) {
         return {
-            code: 200,
-            response: response,
+          code: 404,
+          response: "CycleTimeCOA data is not found!",
         };
+      }
+      const delayNotesCOAData = {
+        ...data,
+        route: cycleTimeCOA.route,
+      };
+      const response = await this.prismaService.delayNotesCOA.update({
+        where: {
+          id: delayNotesCOAId,
+        },
+        data: delayNotesCOAData,
+      });
+      return {
+        code: 200,
+        response: response,
+      };
     } catch (err) {
-        return {
-            code: 500,
-            response: "Internal server error!",
-        };
+      return {
+        code: 500,
+        response: "Internal server error!",
+      };
     }
-}
+  }
 
   async deleteDelayNotesCOA(id: string) {
     try {

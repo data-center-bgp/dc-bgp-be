@@ -37,27 +37,25 @@ const authenticationMiddleware = (
   }
 };
 
-const authorizationMiddleware = (allowedRoles: Role[]) => (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const token = String(
-      req.headers["authorization"]?.split(" ")[1].replace("'", "")
-    );
-    const userRole = cycleTimeCOAGuard.getRoleFromToken(token);
-    if (userRole === null) {
+const authorizationMiddleware =
+  (allowedRoles: Role[]) =>
+  (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      const token = String(
+        req.headers["authorization"]?.split(" ")[1].replace("'", "")
+      );
+      const userRole = cycleTimeCOAGuard.getRoleFromToken(token);
+      if (userRole === null) {
         res.status(401).json("Invalid token!");
-    } else if (allowedRoles.includes(userRole)) {
-      next();
-    } else {
-      res.status(403).json("You don't have permission to access this!");
+      } else if (allowedRoles.includes(userRole)) {
+        next();
+      } else {
+        res.status(403).json("You don't have permission to access this!");
+      }
+    } catch (err) {
+      res.status(500).json("Server error!");
     }
-  } catch (err) {
-    res.status(500).json("Server error!");
-  }
-};
+  };
 
 cycleTimeCOARouter.get("/", authenticationMiddleware, async (req, res) => {
   try {
@@ -142,7 +140,7 @@ cycleTimeCOARouter.delete(
   "/delete/:id",
   authenticationMiddleware,
   authorizationMiddleware([Role.MASTER]),
-  async (req: Request, res: Response) => {
+  async (req, res) => {
     try {
       const response = await cycleTimeCOAService.deleteCycleTimeCOA(
         req.params.id
