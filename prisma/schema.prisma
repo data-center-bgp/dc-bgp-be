@@ -25,6 +25,32 @@ enum Role {
   ADMIN
 }
 
+model Vessel {
+  id               String             @id @default(uuid())
+  email            String             @unique
+  name             String
+  password         String
+  fleet            String
+  type             String
+  attendanceRecord AttendanceRecord[]
+}
+
+model AttendanceRecord {
+  id             String    @id @default(uuid())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  vessel         Vessel    @relation(fields: [vesselId], references: [id])
+  vesselId       String
+  crewId         String
+  crewPosition   String
+  photo          String
+  latitude       Float
+  longitude      Float
+  photoTimeTaken DateTime?
+  photoLatitude  Float?
+  photoLongitude Float?
+}
+
 model CycleTimeCOA {
   id                                    String          @id @default(uuid())
   createdAt                             DateTime        @default(now())
