@@ -16,7 +16,7 @@ export class VesselService {
     };
   }
 
-  async getUserById(id: string) {
+  async getVesselById(id: string) {
     const response = await this.prismaservice.vessel.findUnique({
       where: {
         id: id,
@@ -31,11 +31,11 @@ export class VesselService {
     }
     return {
       code: 403,
-      response: "User is not found!",
+      response: "Vessel is not found!",
     };
   }
 
-  async getUserByVesselName(name: string) {
+  async getVesselByName(name: string) {
     const response = await this.prismaservice.vessel.findFirst({
       where: {
         name: name,
@@ -50,7 +50,7 @@ export class VesselService {
     }
     return {
       code: 403,
-      response: "User is not found!",
+      response: "Vessel is not found!",
     };
   }
 
@@ -80,7 +80,7 @@ export class VesselService {
     }
     return {
       code: 403,
-      response: "User is not found!",
+      response: "Vessel is not found!",
     };
   }
 
@@ -103,7 +103,7 @@ export class VesselService {
     }
     return {
         code: 403,
-        response: "User is not found!",
+        response: "Vessel is not found!",
     };
   }
 }
