@@ -67,6 +67,7 @@ export class VesselAuth {
         name: response.name,
         fleet: response.fleet,
         type: response.type,
+        userType: 'vessel'
       };
       const token = jwt.sign(payload, String(process.env["JWT_KEY"]), {
         expiresIn: "24h",
@@ -76,6 +77,7 @@ export class VesselAuth {
         id: response.id,
         access_token: token,
         name: response.name,
+        userType: 'vessel'
       };
       return {
         code: 200,

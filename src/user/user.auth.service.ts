@@ -63,6 +63,7 @@ export class UserAuth {
         email: response.email,
         name: response.name,
         role: response.role,
+        userType: 'user'
       };
       const token = jwt.sign(payload, String(process.env["JWT_KEY"]), {
         expiresIn: "24h",
@@ -72,6 +73,7 @@ export class UserAuth {
         id: response.id,
         access_token: token,
         role: response.role,
+        userType: 'user'
       };
       return {
         code: 200,

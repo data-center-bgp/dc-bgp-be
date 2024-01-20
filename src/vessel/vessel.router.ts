@@ -16,3 +16,45 @@ interface CustomRequest extends Request {
   id?: string;
   role?: Role;
 }
+
+const authenticationMiddleware = (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = String(req.headers["authorization"]?.split(" ")[1].replace("'", ""));
+    const checkToken = vesselGuard.authentication(token);
+    if (checkToken) {
+      req.id = checkToken.id;
+      req.role = checkToken.role;
+      next();
+    } else {
+      res.status(401).json("Invalid token!");
+    }
+  } catch (err) {
+    req.id = "";
+    res.status(500).json("Error authenticating!");
+  }
+}
+
+const authorizationMiddleware = (allowedRoles: Role[], ) => (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = String(req.headers["authorization"]?.split(" ")[1].replace("'", ""));
+    const userRole = vesselGuard.getRoleFromToken(token);
+    const userType = vesselGuard.getTypeFromToken(token);
+    if (userRole === null || userType === null) {
+      res.status(401).json("Invalid token!");
+    } else if (userType !== 'user' ) {
+      res.status(403).json("You don't have permission to access this!");
+    } else if (allowedRoles.includes(userRole)) {
+      next();
+    }
+  } catch (err) {
+    res.status(500).json("Server error!");
+  }
+}

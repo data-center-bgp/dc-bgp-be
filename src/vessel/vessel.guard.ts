@@ -38,4 +38,13 @@ export class VesselGuard {
       return null;
     }
   }
+
+  getTypeFromToken(token: string): string | null {
+    try {
+      const decodedType = jwt.verify(token, process.env.JWT_KEY as string) as JwtPayload;
+      return decodedType.UserType;
+    } catch (err) {
+      return null;
+    }
+  }
 }
