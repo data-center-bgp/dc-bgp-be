@@ -61,7 +61,7 @@ const authorizationMiddleware =
     }
   };
 
-vesselRouter.post("/register", async (req: Request, res: Response) => {
+vesselRouter.post("/auth/register", async (req: Request, res: Response) => {
   try {
     const response = await vesselAuth.register(req.body);
     res.status(response.code).json(response);
@@ -70,7 +70,7 @@ vesselRouter.post("/register", async (req: Request, res: Response) => {
   }
 });
 
-vesselRouter.post("/login", async (req: Request, res: Response) => {
+vesselRouter.post("/auth/login", async (req: Request, res: Response) => {
   try {
     const response = await vesselAuth.login(req.body);
     res.status(response.code).json(response);
@@ -79,7 +79,7 @@ vesselRouter.post("/login", async (req: Request, res: Response) => {
   }
 });
 
-vesselRouter.get("/vessels", authorizationMiddleware, async (req: Request, res: Response) => {
+vesselRouter.get("/", authorizationMiddleware, async (req: Request, res: Response) => {
   try {
     const response = await vesselService.getAllVessel();
     res.status(response.code).json(response.response);
@@ -88,7 +88,7 @@ vesselRouter.get("/vessels", authorizationMiddleware, async (req: Request, res: 
   }
 });
 
-vesselRouter.get("/vessels/:id", authorizationMiddleware, async (req: Request, res: Response) => {
+vesselRouter.get("/:id", authorizationMiddleware, async (req: Request, res: Response) => {
   try {
     let id = req.params.id;
     if (typeof req.query.id === "string") {
@@ -103,7 +103,7 @@ vesselRouter.get("/vessels/:id", authorizationMiddleware, async (req: Request, r
   }
 });
 
-vesselRouter.get("/vessels/name/:name", authorizationMiddleware, async (req: Request, res: Response) => {
+vesselRouter.get("/name/:name", authorizationMiddleware, async (req: Request, res: Response) => {
   try {
     let name = req.params.name;
     if (typeof req.query.name === "string") {
@@ -118,7 +118,7 @@ vesselRouter.get("/vessels/name/:name", authorizationMiddleware, async (req: Req
   }
 });
 
-vesselRouter.patch("/vessels/edit/:id", authorizationMiddleware([Role.MASTER]), async (req: Request, res: Response) => {
+vesselRouter.patch("/edit/:id", authorizationMiddleware([Role.MASTER]), async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const response = await vesselService.editVesselData(id, req.body);
@@ -128,7 +128,7 @@ vesselRouter.patch("/vessels/edit/:id", authorizationMiddleware([Role.MASTER]), 
   }
 });
 
-vesselRouter.delete("/vessels/delete/:id", authorizationMiddleware([Role.MASTER]), async (req: Request, res: Response) => {
+vesselRouter.delete("/delete/:id", authorizationMiddleware([Role.MASTER]), async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const response = await vesselService.deleteVessel(id);
