@@ -42,7 +42,7 @@ export class VesselGuard {
   getTypeFromToken(token: string): string | null {
     try {
       const decodedType = jwt.verify(token, process.env.JWT_KEY as string) as JwtPayload;
-      return decodedType.UserType;
+      return decodedType.userType;
     } catch (err) {
       return null;
     }

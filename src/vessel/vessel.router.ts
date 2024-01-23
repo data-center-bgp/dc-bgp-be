@@ -40,26 +40,24 @@ const authenticationMiddleware = (
   }
 };
 
-const authorizationMiddleware =
-  (allowedRoles: Role[]) =>
-  (req: CustomRequest, res: Response, next: NextFunction) => {
-    try {
-      const token = String(
-        req.headers["authorization"]?.split(" ")[1].replace("'", "")
-      );
-      const userRole = vesselGuard.getRoleFromToken(token);
-      const userType = vesselGuard.getTypeFromToken(token);
-      if (userRole === null || userType === null) {
-        res.status(401).json("Invalid token!");
-      } else if (userType !== "user") {
-        res.status(403).json("You don't have permission to access this!");
-      } else if (allowedRoles.includes(userRole)) {
-        next();
-      }
-    } catch (err) {
-      res.status(500).json("Server error!");
+const authorizationMiddleware = (allowedRoles: Role[]) => (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const token = String(req.headers["authorization"]?.split(" ")[1]?.replace("'", ""));
+    const decodedRole = vesselGuard.getRoleFromToken(token);
+    const decodedType = vesselGuard.getTypeFromToken(token);
+    if (decodedRole === null || decodedType === null) {
+      res.status(401).json("Invalid token!");
+    } else if (!allowedRoles.includes(decodedRole) || decodedType !== "user") {
+      res.status(403).json("You are not authorized!");
+    } else {
+      next();
     }
-  };
+  } catch (err) {
+    console.error("Error in authorizationMiddleware:", err);
+    res.status(500).json("Server error!");
+  }
+};
+
 
 vesselRouter.post("/auth/register", async (req: Request, res: Response) => {
   try {
@@ -79,7 +77,7 @@ vesselRouter.post("/auth/login", async (req: Request, res: Response) => {
   }
 });
 
-vesselRouter.get("/", authorizationMiddleware, async (req: Request, res: Response) => {
+vesselRouter.get("/", authorizationMiddleware([Role.ADMIN, Role.MASTER, Role.MANAGER]), async (req: Request, res: Response) => {
   try {
     const response = await vesselService.getAllVessel();
     res.status(response.code).json(response.response);
@@ -88,30 +86,22 @@ vesselRouter.get("/", authorizationMiddleware, async (req: Request, res: Respons
   }
 });
 
-vesselRouter.get("/:id", authorizationMiddleware, async (req: Request, res: Response) => {
+vesselRouter.get("/:id", authorizationMiddleware([Role.ADMIN, Role.MASTER, Role.MANAGER]), async (req: Request, res: Response) => {
   try {
-    let id = req.params.id;
-    if (typeof req.query.id === "string") {
-      id = req.query.id;
-    } else {
-      id = "";
-    }
-    const response = await vesselService.getVesselById(id);
+    const response = await vesselService.getVesselById(
+      req.params.id
+    );
     res.status(response.code).json(response.response)
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-vesselRouter.get("/name/:name", authorizationMiddleware, async (req: Request, res: Response) => {
+vesselRouter.get("/name/:name", authorizationMiddleware([Role.ADMIN, Role.MANAGER, Role.MASTER]), async (req: Request, res: Response) => {
   try {
-    let name = req.params.name;
-    if (typeof req.query.name === "string") {
-      name = req.query.name;
-    } else {
-      name = "";
-    }
-    const response = await vesselService.getVesselByName(name);
+    const response = await vesselService.getVesselByName(
+      req.params.name
+    );
     res.status(response.code).json(response.response)
   } catch (err) {
     res.status(500).json(err);

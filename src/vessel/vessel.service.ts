@@ -1,5 +1,4 @@
 import { PrismaService } from "../prisma.service";
-import { EditUser } from "../user/user.interface";
 import { EditVessel } from "./vessel.interface";
 
 export class VesselService {
