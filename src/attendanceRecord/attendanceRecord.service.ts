@@ -1,4 +1,3 @@
-import { response } from "express";
 import { PrismaService } from "../prisma.service";
 import {
   CreateAttendanceRecord,

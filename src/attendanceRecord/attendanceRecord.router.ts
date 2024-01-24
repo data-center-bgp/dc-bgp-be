@@ -42,35 +42,38 @@ const authorizationMiddleware =
   (req: CustomRequest, res: Response, next: NextFunction) => {
     try {
       const token = String(
-        req.headers["authorization"]?.split(" ")[1].replace("'", "")
+        req.headers["authorization"]?.split(" ")[1]?.replace("'", "")
       );
-      const userRole = attendanceRecordGuard.getRoleFromToken(token);
-      const userType = attendanceRecordGuard.getTypeFromToken(token);
-      if (userRole === null || userType === null) {
+      const decodedRole = attendanceRecordGuard.getRoleFromToken(token);
+      const decodedType = attendanceRecordGuard.getTypeFromToken(token);
+      if (decodedRole === null || decodedType === null) {
         res.status(401).json("Invalid token!");
-      } else if (userType !== "user") {
-        res.status(403).json("You don't have permission to access this!");
-      } else if (allowedRoles.includes(userRole)) {
+      } else if (decodedType !== "user" || !allowedRoles.includes(decodedRole)) {
         next();
       }
     } catch (err) {
+      console.error("Error in authorizationMiddleware:", err);
       res.status(500).json("Server error!");
     }
   };
 
-attendanceRecordRouter.get("/", authenticationMiddleware, async (req, res) => {
-  try {
-    const attendanceRecord =
-      await attendanceRecordService.getAllAttendanceRecord();
-    res.status(200).json(attendanceRecord);
-  } catch (err) {
-    res.status(500).json(err);
+attendanceRecordRouter.get(
+  "/",
+  authorizationMiddleware([Role.ADMIN, Role.MANAGER, Role.MASTER]),
+  async (req: Request, res: Response) => {
+    try {
+      const response =
+        await attendanceRecordService.getAllAttendanceRecord();
+      res.status(response.code).json(response.response);
+    } catch (err) {
+      res.status(500).json(err);
+    }
   }
-});
+);
 
 attendanceRecordRouter.get(
   "/:id",
-  authenticationMiddleware,
+  authorizationMiddleware([Role.ADMIN, Role.MANAGER, Role.MASTER]),
   async (req, res) => {
     try {
       const attendanceRecord =
@@ -84,7 +87,7 @@ attendanceRecordRouter.get(
 
 attendanceRecordRouter.get(
   "/crew/:crewId",
-  authenticationMiddleware,
+  authorizationMiddleware([Role.ADMIN, Role.MANAGER, Role.MASTER]),
   async (req, res) => {
     try {
       const attendanceRecord =
@@ -127,7 +130,7 @@ attendanceRecordRouter.patch(
 
 attendanceRecordRouter.delete(
   "/delete/:id",
-  authorizationMiddleware([Role.MASTER, Role.ADMIN]),
+  authorizationMiddleware([Role.MASTER]),
   async (req, res) => {
     try {
       const attendanceRecord =
