@@ -1,14 +1,17 @@
-import { Role } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
-import { UserRegister, UserLogin, ChangePassword } from "./user.interface";
+import {
+  VesselRegister,
+  VesselLogin,
+  ChangePassword,
+} from "./vessel.interface";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export class UserAuth {
+export class VesselAuth {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async register(data: UserRegister) {
-    const isExist = await this.prismaService.user.findFirst({
+  async register(data: VesselRegister) {
+    const isExist = await this.prismaService.vessel.findFirst({
       where: {
         email: data.email,
       },
@@ -16,10 +19,10 @@ export class UserAuth {
     if (isExist) {
       return {
         code: 409,
-        response: "User is already registered!",
+        response: "Vessel is already registered!",
       };
     }
-    const response = await this.prismaService.user.create({
+    const response = await this.prismaService.vessel.create({
       data: {
         ...data,
         password: bcrypt.hashSync(
@@ -41,8 +44,8 @@ export class UserAuth {
     };
   }
 
-  async login(data: UserLogin) {
-    const response = await this.prismaService.user.findFirst({
+  async login(data: VesselLogin) {
+    const response = await this.prismaService.vessel.findFirst({
       where: {
         email: data.email,
       },
@@ -62,8 +65,9 @@ export class UserAuth {
         id: response.id,
         email: response.email,
         name: response.name,
-        role: response.role,
-        userType: 'user'
+        fleet: response.fleet,
+        type: response.type,
+        userType: 'vessel'
       };
       const token = jwt.sign(payload, String(process.env["JWT_KEY"]), {
         expiresIn: "24h",
@@ -72,8 +76,8 @@ export class UserAuth {
       const returnValue = {
         id: response.id,
         access_token: token,
-        role: response.role,
-        userType: 'user'
+        name: response.name,
+        userType: 'vessel'
       };
       return {
         code: 200,
@@ -82,12 +86,12 @@ export class UserAuth {
     }
     return {
       code: 404,
-      response: "User is not found!",
+      response: "Vessel is not found!",
     };
   }
 
   async changePassword(id: string, data: ChangePassword) {
-    const isExist = await this.prismaService.user.findFirst({
+    const isExist = await this.prismaService.vessel.findFirst({
       where: {
         id: id,
       },
@@ -105,10 +109,10 @@ export class UserAuth {
     if (!passwordCheck) {
       return {
         code: 403,
-        response: "Invalid password!",
+        response: "Incorrect password!",
       };
     }
-    const response = await this.prismaService.user.update({
+    const response = await this.prismaService.vessel.update({
       where: {
         id: id,
       },
